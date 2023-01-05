@@ -1,0 +1,11 @@
+.vs/
+.bin/
+.obj/
+SeungmukLib/x64/
+x64/
+SeungmukLib/rapidjson/
+SeungmukLib/Packet/flatbuffers/
+SeungmukLib.sln
+SeungmukLib/SeungmukLib.vcxproj
+SeungmukLib/SeungmukLib.vcxproj.filters
+SeungmukLib/SeungmukLib.vcxproj.user

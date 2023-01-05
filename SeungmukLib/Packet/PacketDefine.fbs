@@ -1,0 +1,30 @@
+union MESSAGE_ID
+{
+  C2S_HEARTBEAT,
+  S2C_HEARTBEAT
+}
+
+struct Vec3{
+  x: float;
+  y: float;
+  z: float;
+}
+
+table Message
+{
+  packet: MESSAGE_ID;
+}
+
+root_type Message;
+
+table C2S_HEARTBEAT
+{
+  id: int;
+  dummy: string;
+}
+
+table S2C_HEARTBEAT
+{
+  id: int;
+  dummy: string;
+}
