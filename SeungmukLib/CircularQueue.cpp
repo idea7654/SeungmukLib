@@ -9,7 +9,7 @@ CircularQueue<T>::CircularQueue()
 }
 
 template <typename T>
-bool CircularQueue<T>::Push(T& data)
+bool CircularQueue<T>::Push(T data)
 {
 	m_Lock.EnterWriteLock();
 	if (m_Front == (m_Tail + 1) % MAX_QUEUE_LENGTH)
@@ -45,4 +45,6 @@ bool CircularQueue<T>::IsEmpty()
 	m_Lock.ReadUnLock();
 }
 
-template class CircularQueue<Packet>;
+//template class CircularQueue<Packet>;
+template class CircularQueue<QUEUE_DATA*>;
+template class CircularQueue<QUEUE_DATA>;

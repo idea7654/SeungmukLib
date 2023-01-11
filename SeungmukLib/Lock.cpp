@@ -23,7 +23,6 @@ void Lock::EnterWriteLock()
 
 void Lock::WriteUnLock()
 {
-
 	ReleaseSRWLockExclusive(&m_Mutex);
 }
 

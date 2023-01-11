@@ -3,19 +3,15 @@
 #include <new>
 #include <memory>
 
-class Node
-{
-	Node* m_Next;
-};
-
 template <typename T>
 class MemoryPool
 {
-private:
-	static Node*	m_Head;
-	static char*	m_MemoryBlock;
+public:
+	static BYTE*	m_MemoryBlock;
 
 public:
+	~MemoryPool(){}
+
 	static void* Alloc(size_t allocSize)
 	{
 		if (m_MemoryBlock == nullptr)
@@ -23,40 +19,41 @@ public:
 			Initialize();
 		}
 
-		auto returnPointer = m_Head;
-		m_Head = m_Head->m_Next;
-		return reinterpret_cast<void*>(returnPointer);
+		BYTE* ReturnPointer = m_MemoryBlock;
+		m_MemoryBlock = *reinterpret_cast<BYTE**>(ReturnPointer);
+		return reinterpret_cast<void*>(ReturnPointer);
 	}
 	static void	Free(void* deletePointer)
 	{
-		auto returnMemory = reinterpret_cast<Node*>(deletePointer);
-		auto oldHead = m_Head;
-		m_Head = returnMemory;
-		m_Head->m_Next = oldHead;
+		*reinterpret_cast<BYTE**>(deletePointer) = m_MemoryBlock;
+		m_MemoryBlock = static_cast<BYTE*>(deletePointer);
 	}
 
 private:
 	static void	Initialize()
 	{
-		m_MemoryBlock = (char*)malloc(sizeof(T) * OBJECTPOOL_SIZE);
-		m_Head = reinterpret_cast<Node*>(m_MemoryBlock);
-
-		for (int i = 0; i < OBJECTPOOL_SIZE - 1; i++) {
-			auto thisNode = reinterpret_cast<Node*>(m_MemoryBlock);
-			thisNode->next = reinterpret_cast<Node*>(m_MemoryBlock + sizeof(T));
+		m_MemoryBlock = new BYTE[sizeof(T) * OBJECTPOOL_SIZE];
+		BYTE** Current = reinterpret_cast<BYTE**>(m_MemoryBlock);
+		BYTE* Next = m_MemoryBlock;
+		for (int i = 0; i < OBJECTPOOL_SIZE - 1; ++i)
+		{
+			Next += sizeof(T);
+			*Current = Next;
+			Current = reinterpret_cast<BYTE**>(Next);
 		}
+		*Current = nullptr;
 	}
-	static void		ExtendMemoryBlock();
+	static void		ExtendMemoryBlock() {};
 };
 
 template <typename T>
-Node* MemoryPool<T>::m_Head;
+BYTE* MemoryPool<T>::m_MemoryBlock;
 
 template <typename T, typename... Args>
 T* Attach(Args&&... args)
 {
 	T* myPtr = static_cast<T*>(MemoryPool<T>::Alloc(sizeof(T)));
-	new(myPtr) T(std::forward<Args...>(args...));
+	new(myPtr) T(std::forward<Args>(args)...);
 	return myPtr;
 }
 
@@ -70,5 +67,7 @@ void Detatch(T* obj)
 template <typename T, typename... Args>
 std::shared_ptr<T> MakeShared(Args&&... args)
 {
-	return std::shared_ptr<T>{ Attach<T>(std::forward<Args...>(args...)), Detatch<T> };
+	return std::shared_ptr<T>{ Attach<T>(std::forward<Args>(args)...), Detatch<T> };
 }
+
+//MemoryPool 고치고...네트워크 부분 완성하자!

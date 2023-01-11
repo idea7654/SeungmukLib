@@ -13,7 +13,7 @@ private:
 
 public:
 	CircularQueue();
-	bool	Push(T& data);
+	bool	Push(T data);
 	T&		Pop();
 	bool	IsEmpty();
 };

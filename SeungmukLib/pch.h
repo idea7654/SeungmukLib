@@ -17,11 +17,17 @@
 #include <synchapi.h>
 #include <thread>
 #include <timeapi.h>
-#include <variant>
+#include <functional>
+
+#include <stdlib.h>
+#include <WinSock2.h>
 
 #define MAX_QUEUE_LENGTH 100
+#define MAX_BUFFER_LENGTH 1024
 #define SOCKET_BUF_SIZE 1024
 #define OBJECTPOOL_SIZE 100
+#define MAX_CLIENT	5000
+#define WORKER_THREAD_SIZE 10
 
 struct Session
 {
@@ -38,6 +44,7 @@ struct QUEUE_DATA
 #include "RandWell.h"
 #include "Lock.h"
 #include "Json.h"
+#include "ThreadManager.h"
 #include "Packet/PacketDefine_generated.h"
 
 #include "Packet.h"
@@ -46,5 +53,7 @@ struct QUEUE_DATA
 #include "CircularQueue.h"
 
 #include "MemoryPool.h"
+#include "Network.h"
+#include "IOCP.h"
 
 #endif //PCH_H

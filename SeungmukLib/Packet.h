@@ -12,6 +12,6 @@ public:
 		m_PacketType = packetType;
 	}
 
-	virtual uint8_t* Encode(int &packetLength); // Encode -> StreamWrite
-	virtual void Decode(const Message *packet); // Decode -> StreamRead
+	virtual uint8_t* Encode(int &packetLength) = 0; // Encode -> StreamWrite
+	virtual void Decode(const Message *packet) = 0; // Decode -> StreamRead
 };
