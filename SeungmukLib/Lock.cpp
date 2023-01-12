@@ -6,23 +6,45 @@ Lock::Lock()
 	InitializeSRWLock(&m_Mutex);
 }
 
-void Lock::EnterReadLock()
+void Lock::EnterLock(LOCK_TYPE lockType)
 {
-	AcquireSRWLockShared(&m_Mutex);
+    switch (lockType)
+    {
+    case READ_LOCK:
+        AcquireSRWLockExclusive(&m_Mutex);
+        break;
+    case WRITE_LOCK:
+        AcquireSRWLockShared(&m_Mutex);
+        break;
+    }
 }
 
-void Lock::ReadUnLock()
+void Lock::LeaveLock(LOCK_TYPE lockType)
 {
-	ReleaseSRWLockShared(&m_Mutex);
+    switch (lockType)
+    {
+    case READ_LOCK:
+        ReleaseSRWLockExclusive(&m_Mutex);
+        break;
+    case WRITE_LOCK:
+        ReleaseSRWLockShared(&m_Mutex);
+        break;
+    }
 }
 
-void Lock::EnterWriteLock()
+bool Lock::TryLock(LOCK_TYPE lockType)
 {
-	AcquireSRWLockExclusive(&m_Mutex);
+    bool bRet = 0;
+    switch (lockType)
+    {
+    case READ_LOCK:
+        bRet = TryAcquireSRWLockExclusive(&m_Mutex);
+        break;
+    case WRITE_LOCK:
+        bRet = TryAcquireSRWLockShared(&m_Mutex);
+        break;
+    }
+    return bRet != 0 ? TRUE : FALSE;
 }
 
-void Lock::WriteUnLock()
-{
-	ReleaseSRWLockExclusive(&m_Mutex);
-}
 

@@ -9,9 +9,8 @@ private:
 public:
 	Lock();
 
-	void EnterReadLock();
-	void ReadUnLock();
-	void EnterWriteLock();
-	void WriteUnLock();
+	void EnterLock(LOCK_TYPE lockType);
+	void LeaveLock(LOCK_TYPE lockType);
+	bool TryLock(LOCK_TYPE lockType);
 };
 

@@ -18,9 +18,11 @@
 #include <thread>
 #include <timeapi.h>
 #include <functional>
+#include <iostream>
 
 #include <stdlib.h>
 #include <WinSock2.h>
+#include <WS2tcpip.h>
 
 #define MAX_QUEUE_LENGTH 100
 #define MAX_BUFFER_LENGTH 1024
@@ -39,6 +41,12 @@ struct QUEUE_DATA
 	WCHAR* Data;
 	size_t DataLength;
 	Session PlayerSession;
+};
+
+enum LOCK_TYPE
+{
+	READ_LOCK = 0,
+	WRITE_LOCK
 };
 
 #include "RandWell.h"
