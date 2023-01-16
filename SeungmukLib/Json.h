@@ -1,6 +1,7 @@
 #pragma once
 #include "pch.h"
 #include "rapidjson/document.h"
+#include "rapidjson/filereadstream.h"
 #include <cstdio>
 
 using namespace rapidjson;
@@ -22,26 +23,35 @@ public:
 		assert(m_Document.IsObject());
 		assert(m_Document.HasMember(row.c_str()));
 
+		std::variant<bool, double, float, int, std::string> returnValue = GetVairantValue(row);
+
+		return std::get<T>(returnValue);
+	}
+
+private:
+	std::variant<bool, double, float, int, std::string> GetVairantValue(std::string row)
+	{
 		if (m_Document[row.c_str()].IsBool())
 		{
 			return m_Document[row.c_str()].GetBool();
 		}
-		else if (m_Document[row.c_str()].IsDouble)
+		else if (m_Document[row.c_str()].IsDouble())
 		{
 			return m_Document[row.c_str()].GetDouble();
 		}
-		else if (m_Document[row.c_str()].IsFloat)
+		else if (m_Document[row.c_str()].IsFloat())
 		{
 			return m_Document[row.c_str()].GetFloat();
 		}
-		else if (m_Document[row.c_str()].IsInt)
+		else if (m_Document[row.c_str()].IsInt())
 		{
 			return m_Document[row.c_str()].GetInt();
 		}
-		else if (m_Document[row.c_str()].IsString)
+		else if (m_Document[row.c_str()].IsString())
 		{
 			return m_Document[row.c_str()].GetString();
 		}
+		return NULL;
 	}
 };
 

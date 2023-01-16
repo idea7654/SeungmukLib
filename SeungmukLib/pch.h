@@ -19,10 +19,13 @@
 #include <timeapi.h>
 #include <functional>
 #include <iostream>
+#include <variant>
 
 #include <stdlib.h>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+
+#pragma comment(lib, "ws2_32.lib")
 
 #define MAX_QUEUE_LENGTH 100
 #define MAX_BUFFER_LENGTH 1024
@@ -31,27 +34,11 @@
 #define MAX_CLIENT	5000
 #define WORKER_THREAD_SIZE 10
 
-struct Session
-{
-
-};
-
-struct QUEUE_DATA
-{
-	WCHAR* Data;
-	size_t DataLength;
-	Session PlayerSession;
-};
-
-enum LOCK_TYPE
-{
-	READ_LOCK = 0,
-	WRITE_LOCK
-};
-
+#include "Types.h"
 #include "RandWell.h"
 #include "Lock.h"
 #include "Json.h"
+#include "CSVParser.h"
 #include "ThreadManager.h"
 #include "Packet/PacketDefine_generated.h"
 
@@ -63,5 +50,6 @@ enum LOCK_TYPE
 #include "MemoryPool.h"
 #include "Network.h"
 #include "IOCP.h"
+#include "UdpNetwork.h"
 
 #endif //PCH_H

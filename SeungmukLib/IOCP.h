@@ -1,35 +1,31 @@
 #pragma once
 #include "pch.h"
-#include <array>
 
-struct SOCKETINFO
+class IOCompletionPort : public Network
 {
 public:
-    char            Ip[16];
-    int             Port;
-    int             WorkerThreadCount;
-    SERVER_STATUS   Status;
-};
+	IOCompletionPort();
+	~IOCompletionPort();
 
-class IOCP : public Network, public SOCKETINFO
-{
+	virtual bool	Initialize(const char* configFile) override;
+	void			StartServer();
+	bool			CreateWorkerThread();
+	void			WorkerThread();
+
+	bool			Receive(char pPacket[], SOCKETINFO* pSocket);
+	virtual bool	Send(char* sendMsg, SOCKETINFO* pSocket, int packetSize) override;
+
+	void			SendMsg(SOCKETINFO* pSocket);
+
+	SOCKETINFO*		GetSocketInfo();
+
 private:
-    SOCKET						            m_ListenSocket;
-    HANDLE						            m_Iocp;
-    Thread*                                 m_AcceptThread;
-    array<Thread*, WORKER_THREAD_SIZE>		m_WorkerThread;
+	SOCKETINFO*		m_SocketInfo;		// 소켓 정보
+	SOCKET			m_ListenSocket;		// 서버 리슨 소켓
+	HANDLE			m_IOCP;			// IOCP 객체 핸들
+	bool			m_bAccept;			// 요청 동작 플래그
+	bool			m_bWorkerThread;	// 작업 스레드 동작 플래그
 
-private:
-    bool						CreateListenSocket();
-    static DWORD WINAPI			AcceptThread(LPVOID serverPtr);
-    static DWORD WINAPI			WorkerThread(LPVOID serverPtr);
-
-public:
-    IOCP();
-    virtual ~IOCP();
-
-    virtual bool	Initialize() override;
-    SOCKET			GetListenSocket();
-    HANDLE			GetIOCPHandle();
-    void			OnAccept(SOCKET accepter, SOCKADDR_IN addrInfo);
+	CircularQueue<QUEUE_DATA>	m_ReadQueue;
+	CircularQueue<QUEUE_DATA>	m_WriteQueue;
 };

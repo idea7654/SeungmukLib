@@ -16,7 +16,7 @@ public:
 	template <typename T, typename... Types>
 	void			CreateThread(std::function<T> function, const char* threadName, Types&&... params)
 	{
-		m_Thread = new thread(function, params...);
+		m_Thread = new thread(std::bind(function, params...));
 		m_Id = m_Thread->get_id();
 		SetThreadName(threadName);
 	}

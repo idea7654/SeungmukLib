@@ -3,7 +3,7 @@
 #include <new>
 #include <memory>
 
-#ifdef _WIN64 || __amd64__
+#ifdef _WIN64
 
 template <typename T>
 class MemoryPool

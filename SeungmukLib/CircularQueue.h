@@ -49,4 +49,13 @@ public:
 	{
 		return m_Front == m_Tail;
 	}
+
+	void	Clear()
+	{
+		while (!this->IsEmpty())
+		{
+			auto deleteObj = this->Pop();
+			delete deleteObj;
+		}
+	}
 };
