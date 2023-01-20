@@ -44,3 +44,15 @@ enum LOCK_TYPE
 	READ_LOCK = 0,
 	WRITE_LOCK
 };
+
+enum DB_TYPE
+{
+	DB_REDIS,
+	DB_MYSQL
+};
+
+enum QUERY_TYPE
+{
+	READ,
+	WRITE
+};

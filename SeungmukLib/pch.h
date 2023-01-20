@@ -7,6 +7,9 @@
 #ifndef PCH_H
 #define PCH_H
 
+#define _HAS_STD_BYTE 0
+#define QUERY_H_RESTRICTION_PERMISSIVE 1
+
 // 여기에 미리 컴파일하려는 헤더 추가
 #include "framework.h"
 #include <Windows.h>
@@ -20,12 +23,14 @@
 #include <functional>
 #include <iostream>
 #include <variant>
+#include <mysql.h>
 
 #include <stdlib.h>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
 
 #pragma comment(lib, "ws2_32.lib")
+#pragma comment(lib, "libmysql.lib")
 
 #define MAX_QUEUE_LENGTH 100
 #define MAX_BUFFER_LENGTH 1024
@@ -51,5 +56,7 @@
 #include "Network.h"
 #include "IOCP.h"
 #include "UdpNetwork.h"
+
+#include "MySQLDB.h"
 
 #endif //PCH_H

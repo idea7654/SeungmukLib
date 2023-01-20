@@ -26,6 +26,7 @@ private:
 	bool			m_bAccept;			// 요청 동작 플래그
 	bool			m_bWorkerThread;	// 작업 스레드 동작 플래그
 
+protected:
 	CircularQueue<QUEUE_DATA>	m_ReadQueue;
 	CircularQueue<QUEUE_DATA>	m_WriteQueue;
 };

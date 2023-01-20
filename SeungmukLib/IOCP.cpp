@@ -213,6 +213,8 @@ bool IOCompletionPort::Receive(char pPacket[], SOCKETINFO* pSocket)
 	if (!m_ReadQueue.Push(newData))
 		return false;
 
+	//auto packet = m_ReadQueue.Pop();
+	//packet.type
 	ProcessPacket();
 }
 

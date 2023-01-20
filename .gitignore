@@ -9,3 +9,4 @@ SeungmukLib.sln
 SeungmukLib/SeungmukLib.vcxproj
 SeungmukLib/SeungmukLib.vcxproj.filters
 SeungmukLib/SeungmukLib.vcxproj.user
+DBGenerator/node_modules/
