@@ -24,6 +24,7 @@
 #include <iostream>
 #include <variant>
 #include <mysql.h>
+#include <hiredis.h>
 
 #include <stdlib.h>
 #include <WinSock2.h>
@@ -41,6 +42,7 @@
 
 #include "Types.h"
 #include "RandWell.h"
+#include "Logger.h"
 #include "Lock.h"
 #include "Json.h"
 #include "CSVParser.h"
@@ -58,5 +60,7 @@
 #include "UdpNetwork.h"
 
 #include "MySQLDB.h"
+#include "RedisDB.h"
+#include "QueryReturn.h"
 
 #endif //PCH_H

@@ -8,13 +8,23 @@ const csvPath = './QueryList.csv';
 const QueryInputPath = './ContentsQueryInput.hpp';
 const QueryReturnPath = './ContentsQueryReturn.hpp';
 
+let removeReg = /[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/ ]/g;
+
 let QueryReturn = `#pragma once
 #include "pch.h"
 #include <sstream>
+
+template <typename T>
+T GetAs(const std::string& s) {
+    std::stringstream ss{s};
+    T t;
+    ss >> t;
+    return t;
+}
 `;
 
 let InputQuery = `#pragma once
-#include "pch.h
+#include "pch.h"
 `;
 
 rowArr = [];
@@ -35,18 +45,9 @@ fs.createReadStream(csvPath)
             //ReturnQuery
             if (OutputList != '') {
                 QueryReturn += `
-template <typename T>
-T GetAs(const std::string& s) {
-    std::stringstream ss{s};
-    T t;
-    ss >> t;
-    return t;
-}
-
 class ${QueryName}_Return : public QueryReturn
 {
 public:
-    
     ${(function () {
         typeArr = [];
         varArr = [];
@@ -63,17 +64,26 @@ public:
 
         let text;
         for (let i in typeArr) {
-            i == 0 ? (text += `std::vector<${typeArr[i]}> ${varArr[i]};`) : (text += `\n    std::vector<${typeArr[i]}> ${varArr[i]};`);
+            //i == 0 ? (text += `std::vector<${typeArr[i]}> ${varArr[i]};`) : (text += `\n    std::vector<${typeArr[i]}> ${varArr[i]};`);
+            let dummyStr = typeArr[i];
+            let dummy = Array.from(dummyStr.matchAll('\\[(.*?)\\]'), (match) => `${match[0]}`);
+            if (dummy.length >= 1) {
+                dummyStr = dummyStr.replace(removeReg, '');
+                i == 0 ? (text += `std::vector<${dummyStr}> ${varArr[i]};`) : (text += `\n    std::vector<${dummyStr}> ${varArr[i]};`);
+            } else {
+                i == 0 ? (text += `${dummyStr} ${varArr[i]};`) : (text += `\n    ${dummyStr} ${varArr[i]};`);
+            }
         }
         text = text.replace('undefined', '');
-
         return text;
     })()}
 
-    virtual void ParseQueryResult(MYSQL_RES* sql_result) override
+    ${(function () {
+        if (DBType == 'MYSQL') {
+            return `virtual void ParseQueryResult(MYSQL_RES* sql_result) override
     {
         MYSQL_ROW row;
-
+        
         while((row = mysql_fetch_row(sql_result)))
         {
             ${(function () {
@@ -92,16 +102,67 @@ public:
 
                 let text;
                 for (let i in typeArr) {
-                    i == 0
-                        ? (text += `${varArr[i]}.push_back(GetAs<${typeArr[i]}>(row[${i}]));`)
-                        : (text += `\n    ${varArr[i]}.push_back(GetAs<${typeArr[i]}>(row[${i}]));`);
+                    let dummyStr = typeArr[i];
+                    let dummy = Array.from(dummyStr.matchAll('\\[(.*?)\\]'), (match) => `${match[0]}`);
+                    if (dummy.length >= 1) {
+                        dummyStr = dummyStr.replace(removeReg, '');
+                        i == 0
+                            ? (text += `${varArr[i]}.push_back(GetAs<${dummyStr}>(row[${i}]));`)
+                            : (text += `\n    ${varArr[i]}.push_back(GetAs<${dummyStr}>(row[${i}]));`);
+                    } else {
+                        i == 0
+                            ? (text += `${varArr[i]} = GetAs<${dummyStr}>(row[${i}]);`)
+                            : (text += `\n    ${varArr[i]} = GetAs<${dummyStr}>(row[${i}]);`);
+                    }
                 }
                 text = text.replace('undefined', '');
 
                 return text;
             })()}
         }
-    }
+    }`;
+        } else {
+            return `virtual void ParseQueryResult(redisReply* sql_result) override
+    {
+        ${(function () {
+            typeArr = [];
+            varArr = [];
+
+            OutputList.split(' ').map((element) => {
+                element = element.replace(',', '');
+                varArr.push(element);
+            });
+
+            OutputListType.split(' ').map((element) => {
+                element = element.replace(',', '');
+                typeArr.push(element);
+            });
+
+            let text;
+
+            for (let i in typeArr) {
+                let dummyStr = typeArr[i];
+                let dummy = Array.from(dummyStr.matchAll('\\[(.*?)\\]'), (match) => `${match[0]}`);
+                if (dummy.length >= 1) {
+                    text += `for(int i = 0; i < sql_result->elements; i++)\n        {\n            `;
+                    i == 0
+                        ? (text += `${varArr[i]}.push_back(GetAs<${typeArr[i]}>(sql_result->element[i]->str));`)
+                        : (text += `\n    ${varArr[i]}.push_back(GetAs<${typeArr[i]}>(sql_result->element[i]->str));`);
+                    text += '\n        }';
+                } else {
+                    i == 0
+                        ? (text += `${varArr[i]} = GetAs<${typeArr[i]}>(sql_result->str);`)
+                        : (text += `\n    ${varArr[i]} = GetAs<${typeArr[i]}>(sql_result->str);`);
+                }
+            }
+
+            text = text.replace('undefined', '');
+
+            return text;
+        })()}
+    }`;
+        }
+    })()}    
 };
 `;
             }
@@ -135,7 +196,7 @@ public:
 public:
     ${QueryName}()
     {
-        SetDBType(DB_TYPE::${DBType});
+        SetDBType(DB_TYPE::DB_${DBType});
         SetQueryType(QUERY_TYPE::${OutputList == '' ? 'WRITE' : 'READ'});
     }
 

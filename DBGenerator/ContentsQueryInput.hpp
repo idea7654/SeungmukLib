@@ -10,7 +10,7 @@ public:
 public:
     SET_ITEM()
     {
-        SetDBType(DB_TYPE::MYSQL);
+        SetDBType(DB_TYPE::DB_MYSQL);
         SetQueryType(QUERY_TYPE::WRITE);
     }
 
@@ -36,7 +36,7 @@ public:
 public:
     GET_ITEM_FROM_USERID()
     {
-        SetDBType(DB_TYPE::MYSQL);
+        SetDBType(DB_TYPE::DB_MYSQL);
         SetQueryType(QUERY_TYPE::READ);
     }
 
@@ -50,6 +50,29 @@ public:
         this->TABLE_NAME = TABLE_NAME;
         this->USER_ID = USER_ID;
         this->ITEM_NAME = ITEM_NAME;
+    }
+};
+                
+class GET_FOO : public QueryInput
+{
+public:
+    string foo;
+
+public:
+    GET_FOO()
+    {
+        SetDBType(DB_TYPE::DB_REDIS);
+        SetQueryType(QUERY_TYPE::READ);
+    }
+
+    virtual std::string MakeQuery() override
+    {
+        return ("GET " + foo);
+    }
+
+    void SetParameter(string foo)
+    {
+        this->foo = foo;
     }
 };
                 
