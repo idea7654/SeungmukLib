@@ -22,6 +22,7 @@
 #include <timeapi.h>
 #include <functional>
 #include <iostream>
+#include <iomanip>
 #include <variant>
 #include <mysql.h>
 #include <hiredis.h>
@@ -58,6 +59,7 @@
 #include "Network.h"
 #include "IOCP.h"
 #include "UdpNetwork.h"
+#include "HttpNetwork.h"
 
 #include "MySQLDB.h"
 #include "RedisDB.h"

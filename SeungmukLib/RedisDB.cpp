@@ -12,11 +12,11 @@ bool RedisDB::Initialize(const char* configFile)
     {
         if (m_RedisContext)
         {
-            cout << "Connection Error: " << m_RedisContext->errstr << endl;
+            g_Log.error("Redis Connection Error: %s\n", m_RedisContext->errstr);
         }
         else
         {
-            cout << "Connection Error: Can't allocate redis context" << endl;
+            g_Log.error("Redis Connection Error: Can't Allocate Redis Context\n");
         }
         return false;
     }

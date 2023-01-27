@@ -44,7 +44,7 @@ bool IOCompletionPort::Initialize(const char *configFile)
 
 	if (nResult != 0)
 	{
-		printf_s("[ERROR] winsock Initialize Failed\n");
+		g_Log.error("Winsock Initialize Failed\n");
 		return false;
 	}
 
@@ -52,7 +52,7 @@ bool IOCompletionPort::Initialize(const char *configFile)
 	m_ListenSocket = WSASocket(AF_INET, SOCK_STREAM, 0, NULL, 0, WSA_FLAG_OVERLAPPED);
 	if (m_ListenSocket == INVALID_SOCKET)
 	{
-		printf_s("[ERROR] Socket Create Failed\n");
+		g_Log.error("Socket Create Failed\n");
 		return false;
 	}
 
@@ -66,7 +66,7 @@ bool IOCompletionPort::Initialize(const char *configFile)
 	nResult = ::bind(m_ListenSocket, (struct sockaddr*)&serverAddr, sizeof(SOCKADDR_IN));
 	if (nResult == SOCKET_ERROR)
 	{
-		printf_s("[ERROR] bind Failed\n");
+		g_Log.error("Bind Failed\n");
 		closesocket(m_ListenSocket);
 		WSACleanup();
 		return false;
@@ -75,7 +75,7 @@ bool IOCompletionPort::Initialize(const char *configFile)
 	nResult = ::listen(m_ListenSocket, 5);
 	if (nResult == SOCKET_ERROR)
 	{
-		printf_s("[ERROR] listen Failed\n");
+		g_Log.warn("Listen Failed\n");
 		closesocket(m_ListenSocket);
 		WSACleanup();
 		return false;
@@ -108,7 +108,7 @@ void IOCompletionPort::StartServer()
 
 		if (clientSocket == INVALID_SOCKET)
 		{
-			printf_s("[ERROR] Accept 실패\n");
+			g_Log.warn("Accept Failed\n");
 			return;
 		}
 
@@ -126,7 +126,7 @@ void IOCompletionPort::StartServer()
 
 		if (nResult == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING)
 		{
-			printf_s("[ERROR] IO Pending 실패 : %d", WSAGetLastError());
+			g_Log.warn("IO Pending Failed: %d\n", WSAGetLastError());
 			return;
 		}
 	}
@@ -197,7 +197,7 @@ void IOCompletionPort::WorkerThread()
 
 			if (nResult == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING)
 			{
-				printf_s("[ERROR] WSARecv Failed : %d", WSAGetLastError());
+				g_Log.warn("WSARecv Failed: %d\n", WSAGetLastError());
 			}
 		}
 	}
@@ -218,11 +218,11 @@ bool IOCompletionPort::Receive(char pPacket[], SOCKETINFO* pSocket)
 	ProcessPacket();
 }
 
-bool IOCompletionPort::Send(char* sendMsg, SOCKETINFO* pSocket, int packetSize)
+bool IOCompletionPort::Send(unsigned char* sendMsg, SOCKETINFO* pSocket)
 {
 	QUEUE_DATA newData;
 	newData.clientInfo = pSocket;
-	newData.packetData = sendMsg;
+	newData.packetData = reinterpret_cast<char*>(sendMsg);
 	newData.type = OVERLAPPED_TYPE::SEND;
 
 	if (!m_WriteQueue.Push(newData))
@@ -249,7 +249,7 @@ void IOCompletionPort::SendMsg(SOCKETINFO* pSocket)
 
 	if (nResult == SOCKET_ERROR && WSAGetLastError() != WSA_IO_PENDING)
 	{
-		printf_s("[ERROR] WSASend Failed : %d", WSAGetLastError());
+		g_Log.warn("WSASend Failed: %d\n", WSAGetLastError());
 	}
 }
 

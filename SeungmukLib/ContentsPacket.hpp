@@ -39,6 +39,7 @@ public:
 
 class Packet_S2C_HEARTBEAT : public Packet
 {
+public:
     int id;
     string dummy;
 

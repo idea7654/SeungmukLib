@@ -17,7 +17,7 @@ bool MySQLDB::Initialize(const char* configFile)
 	m_ConnPtr = mysql_real_connect(&m_Conn, host.c_str(), user.c_str(), password.c_str(), /*접속할 데이터베이스*/dbName.c_str(), port, (char*)NULL, 0);
 	if (m_ConnPtr == NULL)
 	{
-		cout << "MySQL Connect Error!" << endl;
+		g_Log.error("MySQL Connect Error\n");
 		return false;
 	}
 	cout << "MySQL Connect Success!" << endl;

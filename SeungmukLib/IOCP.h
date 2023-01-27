@@ -13,7 +13,7 @@ public:
 	void			WorkerThread();
 
 	bool			Receive(char pPacket[], SOCKETINFO* pSocket);
-	virtual bool	Send(char* sendMsg, SOCKETINFO* pSocket, int packetSize) override;
+	virtual bool	Send(unsigned char* sendMsg, SOCKETINFO* pSocket) override;
 
 	void			SendMsg(SOCKETINFO* pSocket);
 

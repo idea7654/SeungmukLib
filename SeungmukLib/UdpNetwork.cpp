@@ -32,14 +32,14 @@ bool UdpNetwork::Initialize(const char* configFile)
 
 	if (WSAStartup(0x202, &m_WsaData) == SOCKET_ERROR)
 	{
-		cout << "WinSock Initialize Error " << endl;
+		g_Log.error("WinSock Initialize Error\n");
 		WSACleanup();
 	}
 
 	m_Socket = ::socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
 	if (m_Socket == INVALID_SOCKET)
 	{
-		cout << "Socket Create Error" << endl;
+		g_Log.error("Socket Create Error\n");
 		closesocket(m_Socket);
 		WSACleanup();
 		return false;
@@ -74,7 +74,7 @@ bool UdpNetwork::Bind()
 	m_UdpRemoteInfo.sin_addr.s_addr = htonl(INADDR_ANY);
 	if (::bind(m_Socket, (SOCKADDR*)&m_UdpRemoteInfo, sizeof(m_UdpRemoteInfo)) == SOCKET_ERROR)
 	{
-		cout << "Failed To Bind" << endl;
+		g_Log.error("Failed To Bind\n");
 		closesocket(m_Socket);
 		WSACleanup();
 		return false;
@@ -108,7 +108,7 @@ bool UdpNetwork::RecvFrom()
 	return true;
 }
 
-bool UdpNetwork::Send(char* sendMsg, int packetSize, UDP_QUEUE_DATA sendData)
+bool UdpNetwork::Send(unsigned char* sendMsg, int packetSize, UDP_QUEUE_DATA sendData)
 {
 	if (!m_Socket)
 		return false;

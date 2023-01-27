@@ -12,7 +12,7 @@ public:
 	bool			End();
 	bool			Bind();
 	bool			RecvFrom();
-	virtual bool	Send(char* sendMsg, int packetSize, UDP_QUEUE_DATA sendData) override;
+	virtual bool	Send(unsigned char* sendMsg, int packetSize, UDP_QUEUE_DATA sendData) override;
 
 	void			CreateWorkerThread();
 	void			WorkerThread();
