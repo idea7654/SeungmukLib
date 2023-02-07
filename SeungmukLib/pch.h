@@ -30,6 +30,8 @@
 #include <stdlib.h>
 #include <WinSock2.h>
 #include <WS2tcpip.h>
+#include <mstcpip.h>
+#include <chrono>
 
 #pragma comment(lib, "ws2_32.lib")
 #pragma comment(lib, "libmysql.lib")
@@ -41,6 +43,7 @@
 #define MAX_CLIENT	5000
 #define WORKER_THREAD_SIZE 10
 
+#include "Session.h"
 #include "Types.h"
 #include "RandWell.h"
 #include "Logger.h"
@@ -56,6 +59,7 @@
 #include "CircularQueue.h"
 
 #include "MemoryPool.h"
+#include "SessionManager.h"
 #include "Network.h"
 #include "IOCP.h"
 #include "UdpNetwork.h"

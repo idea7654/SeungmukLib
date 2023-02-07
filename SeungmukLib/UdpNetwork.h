@@ -12,7 +12,7 @@ public:
 	bool			End();
 	bool			Bind();
 	bool			RecvFrom();
-	virtual bool	Send(unsigned char* sendMsg, int packetSize, UDP_QUEUE_DATA sendData) override;
+	virtual bool	Send(unsigned char* sendMsg, int packetSize, UDP_SOCKETINFO sendData) override;
 
 	void			CreateWorkerThread();
 	void			WorkerThread();
@@ -29,7 +29,7 @@ private:
 	WSADATA			m_WsaData;
 	SOCKADDR_IN		m_UdpRemoteInfo;
 
-	CircularQueue<UDP_QUEUE_DATA>	m_ReadQueue;
-	CircularQueue<UDP_QUEUE_DATA>	m_WriteQueue;
+	CircularQueue<UDP_SOCKETINFO>	m_ReadQueue;
+	CircularQueue<UDP_SOCKETINFO>	m_WriteQueue;
 };
 

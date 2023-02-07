@@ -94,7 +94,7 @@ bool UdpNetwork::RecvFrom()
 	char* remoteAddress = inet_ntoa(m_ClientInfo.sin_addr);
 	int remotePort = htons(m_ClientInfo.sin_port);
 
-	UDP_QUEUE_DATA newData;
+	UDP_SOCKETINFO newData;
 	newData.ipAddress = remoteAddress;
 	newData.packetData = m_ReadBuffer;
 	newData.packetLength = recvLen;
@@ -108,7 +108,7 @@ bool UdpNetwork::RecvFrom()
 	return true;
 }
 
-bool UdpNetwork::Send(unsigned char* sendMsg, int packetSize, UDP_QUEUE_DATA sendData)
+bool UdpNetwork::Send(unsigned char* sendMsg, int packetSize, UDP_SOCKETINFO sendData)
 {
 	if (!m_Socket)
 		return false;

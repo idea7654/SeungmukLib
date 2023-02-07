@@ -105,14 +105,19 @@ void IOCompletionPort::StartServer()
 	while (m_bAccept)
 	{
 		clientSocket = WSAAccept(m_ListenSocket, (struct sockaddr*)&clientAddr, &addrLen, NULL, NULL);
-
-		if (clientSocket == INVALID_SOCKET)
+		if (!SetSocketOpt())
 		{
-			g_Log.warn("Accept Failed\n");
+			g_Log.warn("Socket Opt Failed!\n");
 			return;
 		}
 
-		m_SocketInfo = new SOCKETINFO();
+		if (clientSocket == INVALID_SOCKET)
+		{
+			g_Log.warn("Accept Failed!\n");
+			return;
+		}
+
+		m_SocketInfo = new TCP_SOCKETINFO();
 		m_SocketInfo->socket = clientSocket;
 		m_SocketInfo->recvBytes = 0;
 		m_SocketInfo->sendBytes = 0;
@@ -129,6 +134,7 @@ void IOCompletionPort::StartServer()
 			g_Log.warn("IO Pending Failed: %d\n", WSAGetLastError());
 			return;
 		}
+
 	}
 }
 
@@ -151,9 +157,9 @@ void IOCompletionPort::WorkerThread()
 	DWORD	recvBytes;
 	DWORD	sendBytes;
 	// Completion Key를 받을 포인터 변수
-	SOCKETINFO* completionKey;
+	TCP_SOCKETINFO* completionKey;
 	// I/O 작업을 위해 요청한 Overlapped 구조체를 받을 포인터
-	SOCKETINFO* socketInfo;
+	TCP_SOCKETINFO* socketInfo;
 	DWORD dwFlags = 0;
 
 	while (m_bWorkerThread)
@@ -203,7 +209,7 @@ void IOCompletionPort::WorkerThread()
 	}
 }
 
-bool IOCompletionPort::Receive(char pPacket[], SOCKETINFO* pSocket)
+bool IOCompletionPort::Receive(char pPacket[], TCP_SOCKETINFO* pSocket)
 {
 	QUEUE_DATA newData;
 	newData.clientInfo = pSocket;
@@ -213,25 +219,30 @@ bool IOCompletionPort::Receive(char pPacket[], SOCKETINFO* pSocket)
 	if (!m_ReadQueue.Push(newData))
 		return false;
 
-	//auto packet = m_ReadQueue.Pop();
-	//packet.type
 	ProcessPacket();
+
+	return true;
 }
 
-bool IOCompletionPort::Send(unsigned char* sendMsg, SOCKETINFO* pSocket)
+bool IOCompletionPort::Send(unsigned char* sendMsg, TCP_SOCKETINFO* pSocket, int packetLength)
 {
-	QUEUE_DATA newData;
+	/*QUEUE_DATA newData;
 	newData.clientInfo = pSocket;
 	newData.packetData = reinterpret_cast<char*>(sendMsg);
 	newData.type = OVERLAPPED_TYPE::SEND;
 
 	if (!m_WriteQueue.Push(newData))
-		return false;
+		return false;*/
+
+	pSocket->dataBuf.buf = reinterpret_cast<char*>(sendMsg);
+	pSocket->dataBuf.len = packetLength;
+
+	SendMsg(pSocket);
 
 	return true;
 }
 
-void IOCompletionPort::SendMsg(SOCKETINFO* pSocket)
+void IOCompletionPort::SendMsg(TCP_SOCKETINFO* pSocket)
 {
 	int		nResult;
 	DWORD	sendBytes;
@@ -253,7 +264,21 @@ void IOCompletionPort::SendMsg(SOCKETINFO* pSocket)
 	}
 }
 
-SOCKETINFO* IOCompletionPort::GetSocketInfo()
+TCP_SOCKETINFO* IOCompletionPort::GetSocketInfo()
 {
 	return this->m_SocketInfo;
+}
+
+bool IOCompletionPort::SetSocketOpt()
+{
+	tcp_keepalive keepAliveSet = { 0 }, returned = { 0 };
+	keepAliveSet.onoff = 1;
+	keepAliveSet.keepalivetime = 3000; //Keep Alive in 3 sec
+	keepAliveSet.keepaliveinterval = 3000; //Resend in No-Reply
+
+	DWORD dwBytes;
+	if (WSAIoctl(m_ListenSocket, SIO_KEEPALIVE_VALS, &keepAliveSet, sizeof(keepAliveSet), &returned, sizeof(returned), &dwBytes, NULL, NULL) != 0)
+		return false;
+
+	return true;
 }

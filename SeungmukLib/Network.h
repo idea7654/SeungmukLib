@@ -17,10 +17,12 @@ protected:
 
 public:
 	virtual bool				Initialize(const char* configFile) { return false; }
-	virtual bool				Send(unsigned char* sendMsg, SOCKETINFO* pSocket) { return false; }
-	virtual bool				Send(unsigned char* sendMsg, int packetSize, UDP_QUEUE_DATA sendData) { return false; }
+	virtual bool				Send(unsigned char* sendMsg, TCP_SOCKETINFO* pSocket, int packetLength) { return false; }
+	virtual bool				Send(unsigned char* sendMsg, int packetSize, UDP_SOCKETINFO sendData) { return false; }
 	//이 부분을 부모로 올려서 Template으로 만들던가 하는 방법이 있음..
 	virtual void				ProcessPacket() {}
+	
+	virtual bool				SetSocketOpt() { return false; }
 
 	//Checksum
 	//DataLength

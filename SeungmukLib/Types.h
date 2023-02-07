@@ -9,30 +9,38 @@ enum OVERLAPPED_TYPE
 	CLOSE
 };
 
-struct SOCKETINFO
+class TCP_SOCKETINFO : public Session
 {
+public:
 	WSAOVERLAPPED	overlapeed;
 	WSABUF			dataBuf;
 	SOCKET			socket;
 	char			messageBuffer[MAX_BUFFER_LENGTH];
 	int				recvBytes;
 	int				sendBytes;
-};
 
-struct Session
-{
+public:
+	virtual void	Close() override
+	{
+		::closesocket(socket);
+	}
 
+	virtual void	ForceClose(LINGER linger) override
+	{
+		::setsockopt(socket, SOL_SOCKET, SO_LINGER, (char*)&linger, sizeof(linger));
+	}
 };
 
 struct QUEUE_DATA
 {
 	char*				packetData;
-	SOCKETINFO*			clientInfo;
+	TCP_SOCKETINFO*		clientInfo;
 	OVERLAPPED_TYPE		type;
 };
 
-struct UDP_QUEUE_DATA
+class UDP_SOCKETINFO : public Session
 {
+public:
 	char*	packetData;
 	char*	ipAddress;
 	short	port;
